@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:trina_grid_demo/app_state.dart';
 import 'package:trina_grid_demo/my_trina_table/my_trina_table.dart';
-import 'package:trina_grid_demo/table_header.dart';
+import 'package:trina_grid_demo/person_attributes.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> {
     final grid = MyTrinaTable(
       sortAsc: true,
       sortColIndex: 1,
-      headingsSource: TableHeader.values,
+      headingsSource: PersonAttributes.values,
       rowsSource: appState.people,
       deleteRow: (id) => appState.deletePerson(id),
     );

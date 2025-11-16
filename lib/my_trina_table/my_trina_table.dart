@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:trina_grid/trina_grid.dart';
-import 'package:trina_grid_demo/my_trina_table/trina_head_source.dart';
+import 'package:trina_grid_demo/my_trina_table/trina_heading_source.dart';
 import 'package:trina_grid_demo/my_trina_table/trina_row_source.dart';
 
 /// Produces a table, based on the TrinaGrid package, displaying tabular data
+/// that can be updated via simply updating the backing-data
 class MyTrinaTable extends StatefulWidget {
   const MyTrinaTable({
     super.key,
@@ -21,7 +22,7 @@ class MyTrinaTable extends StatefulWidget {
   final int sortColIndex;
 
   /// A list of objects whose class the column-headings can be derived
-  final List<TrinaHeadSource> headingsSource;
+  final List<TrinaHeadingSource> headingsSource;
 
   /// A list of objects whose class the table-rows can be derived
   final List<TrinaRowSource> rowsSource;

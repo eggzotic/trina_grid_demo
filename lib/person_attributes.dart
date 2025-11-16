@@ -1,7 +1,7 @@
 import 'package:trina_grid/trina_grid.dart';
-import 'package:trina_grid_demo/my_trina_table/trina_head_source.dart';
+import 'package:trina_grid_demo/my_trina_table/trina_heading_source.dart';
 
-enum TableHeader implements TrinaHeadSource {
+enum PersonAttributes implements TrinaHeadingSource {
   firstName(title: "First name"),
   surname(title: "Surname"),
   age(title: "Age"),
@@ -11,7 +11,7 @@ enum TableHeader implements TrinaHeadSource {
 
   final String title;
 
-  const TableHeader({required this.title});
+  const PersonAttributes({required this.title});
 
   @override
   TrinaColumn columnFor() {
