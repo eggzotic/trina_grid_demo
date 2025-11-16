@@ -25,7 +25,7 @@ class Person {
   int get ageInYears =>
       (DateTime.now().difference(birthday).inSeconds / DateExt.secondsPerYear)
           .floor();
-  Map<String, TrinaCell> cellFor() {
+  Map<String, TrinaCell> tableRowFor() {
     return {
       'firstName': TrinaCell(value: firstName),
       'surname': TrinaCell(value: surname),

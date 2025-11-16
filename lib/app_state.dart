@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:random_name_generator/random_name_generator.dart';
 import 'package:trina_grid_demo/date_ext.dart';
@@ -9,6 +11,7 @@ class AppState with ChangeNotifier {
 
   AppState() {
     _people.addAll(_generatePeople());
+    _dataUpdater();
   }
   //
 
@@ -53,4 +56,12 @@ class AppState with ChangeNotifier {
 
   List<Person> _generatePeople() =>
       List.generate(rows, (row) => _generateNewPerson());
+
+  // Simulate data being updated in the background, e.g. via the responses to a polling API request
+
+  void _dataUpdater() {
+    Timer.periodic(Duration(seconds: 5), (timer) {
+      if (_people.length < 20) addPerson();
+    });
+  }
 }
