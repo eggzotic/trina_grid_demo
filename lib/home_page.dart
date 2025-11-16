@@ -23,6 +23,7 @@ class _HomePageState extends State<HomePage> {
       headingsSource: PersonAttributes.values,
       rowsSource: appState.people,
       deleteRow: (id) => appState.deletePerson(id),
+      deleteIcon: Tooltip(message: "Nuke it!", child: Icon(Icons.close)),
     );
     return Scaffold(
       appBar: AppBar(

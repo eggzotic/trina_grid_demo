@@ -13,6 +13,7 @@ class MyTrinaTable extends StatefulWidget {
     required this.headingsSource,
     required this.rowsSource,
     this.deleteRow,
+    this.deleteIcon,
   });
 
   /// Whether to initially sort Ascending
@@ -30,6 +31,9 @@ class MyTrinaTable extends StatefulWidget {
   /// An optional function which can perform the corresponding data-source-level delete of a row
   final void Function(String id)? deleteRow;
 
+  /// Alternative icon to appear as the delete-row symbol - should be wrapped in Tooltip (if desired) as well
+  final Widget? deleteIcon;
+
   @override
   State<MyTrinaTable> createState() => _MyTrinaTableState();
 }
@@ -38,30 +42,34 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
   TrinaGridStateManager? _stateManager;
   late TrinaColumn _sortCol;
 
+  bool get _deleteAvailable => widget.deleteRow != null;
+
   void _buildRows() {
     final state = _stateManager;
     if (state == null) return;
-    final people = widget.rowsSource;
+    final rowItems = widget.rowsSource;
     state
       ..removeAllRows(notify: false)
       ..appendRows(
-        people.map((person) {
+        rowItems.map((item) {
           return TrinaRow(
-            key: ValueKey(person.id),
-            cells: person.tableRowFor()
+            key: ValueKey(item.id),
+            cells: item.tableRowFor()
               ..addEntries([
-                MapEntry(
-                  'delete',
-                  TrinaCell(
-                    value: "",
-                    renderer: (rendererContext) => IconButton(
-                      onPressed: () {
-                        widget.deleteRow?.call(person.id);
-                      },
-                      icon: Icon(Icons.delete),
+                if (_deleteAvailable)
+                  MapEntry(
+                    'delete',
+                    TrinaCell(
+                      value: "",
+                      renderer: (rendererContext) => IconButton(
+                        tooltip: widget.deleteIcon != null ? "" : "Delete",
+                        onPressed: () {
+                          widget.deleteRow?.call(item.id);
+                        },
+                        icon: widget.deleteIcon ?? Icon(Icons.delete),
+                      ),
                     ),
                   ),
-                ),
               ]),
           );
         }).toList(),
@@ -80,16 +88,21 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
   @override
   Widget build(BuildContext context) {
     debugPrint("_MyTrinaTableState build");
-    final columns =
-        widget.headingsSource.map((heading) => heading.columnFor()).toList()
-          ..insert(
-            0,
-            TrinaColumn(
-              title: "",
-              field: 'delete',
-              type: TrinaColumnType.text(),
-            ),
-          );
+    final columns = widget.headingsSource
+        .map((heading) => heading.columnFor())
+        .toList();
+    if (_deleteAvailable) {
+      columns.insert(
+        0,
+        TrinaColumn(
+          title: "",
+          field: 'delete',
+          type: TrinaColumnType.text(),
+          readOnly: true,
+          enableSorting: false,
+        ),
+      );
+    }
     _buildRows();
     return TrinaGrid(
       columns: columns,
@@ -103,7 +116,7 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
           _stateManager!.autoFitColumn(context, col);
         }
         // setup initial sorting
-        _sortCol = columns[widget.sortColIndex];
+        _sortCol = columns[widget.sortColIndex + (_deleteAvailable ? 1 : 0)];
         widget.sortAsc
             ? _stateManager!.sortAscending(_sortCol)
             : _stateManager!.sortDescending(_sortCol);
