@@ -1,38 +1,52 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:trina_grid/trina_grid.dart';
-import 'package:trina_grid_demo/app_state.dart';
-import 'package:trina_grid_demo/table_header.dart';
+import 'package:trina_grid_demo/my_trina_table/trina_head_source.dart';
+import 'package:trina_grid_demo/my_trina_table/trina_row_source.dart';
 
+/// Produces a table, based on the TrinaGrid package, displaying tabular data
 class MyTrinaTable extends StatefulWidget {
   const MyTrinaTable({
     super.key,
     required this.sortAsc,
     required this.sortColIndex,
+    required this.headingsSource,
+    required this.rowsSource,
+    this.deleteRow,
   });
 
+  /// Whether to initially sort Ascending
   final bool sortAsc;
+
+  /// The initial column-index to sort on
   final int sortColIndex;
+
+  /// A list of objects whose class the column-headings can be derived
+  final List<TrinaHeadSource> headingsSource;
+
+  /// A list of objects whose class the table-rows can be derived
+  final List<TrinaRowSource> rowsSource;
+
+  /// An optional function which can perform the corresponding data-source-level delete of a row
+  final void Function(String id)? deleteRow;
 
   @override
   State<MyTrinaTable> createState() => _MyTrinaTableState();
 }
 
 class _MyTrinaTableState extends State<MyTrinaTable> {
-  late final _appState = context.read<AppState>();
   TrinaGridStateManager? _stateManager;
   late TrinaColumn _sortCol;
 
   void _buildRows() {
     final state = _stateManager;
     if (state == null) return;
-    final people = _appState.people;
+    final people = widget.rowsSource;
     state
       ..removeAllRows(notify: false)
       ..appendRows(
         people.map((person) {
           return TrinaRow(
-            key: ValueKey(person.uuid),
+            key: ValueKey(person.id),
             cells: person.tableRowFor()
               ..addEntries([
                 MapEntry(
@@ -41,8 +55,7 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
                     value: "",
                     renderer: (rendererContext) => IconButton(
                       onPressed: () {
-                        _appState.deletePerson(person.uuid);
-                        // _buildRows();
+                        widget.deleteRow?.call(person.id);
                       },
                       icon: Icon(Icons.delete),
                     ),
@@ -67,7 +80,7 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
   Widget build(BuildContext context) {
     debugPrint("_MyTrinaTableState build");
     final columns =
-        TableHeader.values.map((heading) => heading.columnFor()).toList()
+        widget.headingsSource.map((heading) => heading.columnFor()).toList()
           ..insert(
             0,
             TrinaColumn(
@@ -84,14 +97,16 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
       rows: [],
       onLoaded: (event) {
         _stateManager = event.stateManager;
+        // Auto-fit all cols initially
         for (final col in columns) {
           _stateManager!.autoFitColumn(context, col);
-          debugPrint("Auto-fitting column: ${col.field}");
         }
+        // setup initial sorting
         _sortCol = columns[widget.sortColIndex];
         widget.sortAsc
             ? _stateManager!.sortAscending(_sortCol)
             : _stateManager!.sortDescending(_sortCol);
+        // initialise the rows
         _buildRows();
       },
       onSorted: (event) {

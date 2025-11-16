@@ -1,9 +1,10 @@
 import 'package:trina_grid/trina_grid.dart';
 import 'package:trina_grid_demo/date_ext.dart';
 import 'package:trina_grid_demo/occupation.dart';
+import 'package:trina_grid_demo/my_trina_table/trina_row_source.dart';
 import 'package:uuid/uuid.dart';
 
-class Person {
+class Person implements TrinaRowSource {
   // these field names must match *exactly* the corresponding enum cases (TableHeader)
   final String firstName;
   final String surname;
@@ -11,6 +12,9 @@ class Person {
   final DateTime birthday;
   final bool hasDog;
   final String uuid;
+
+  @override
+  String get id => uuid;
 
   Person({
     required this.birthday,
@@ -25,6 +29,7 @@ class Person {
   int get ageInYears =>
       (DateTime.now().difference(birthday).inSeconds / DateExt.secondsPerYear)
           .floor();
+  @override
   Map<String, TrinaCell> tableRowFor() {
     return {
       'firstName': TrinaCell(value: firstName),
