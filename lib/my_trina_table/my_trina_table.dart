@@ -15,6 +15,7 @@ class MyTrinaTable extends StatefulWidget {
     this.deleteRow,
     this.deleteIcon,
     this.isTransparent = true,
+    this.brightness,
   });
 
   /// Whether to initially sort Ascending
@@ -40,6 +41,10 @@ class MyTrinaTable extends StatefulWidget {
   /// Whether to make the table transparent, and so allow the parent/wrapping
   /// background be visible instead
   final bool isTransparent;
+
+  /// The current/in-effect brightness (i.e. light/dark mode).
+  /// Defaults to the platform brightness.
+  final Brightness? brightness;
 
   @override
   State<MyTrinaTable> createState() => _MyTrinaTableState();
@@ -110,15 +115,28 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
       );
     }
     _buildRows();
+    final brightness =
+        widget.brightness ?? MediaQuery.platformBrightnessOf(context);
+    final themeDark = widget.isTransparent
+        ? TrinaGridStyleConfig.dark(
+            gridBackgroundColor: Colors.transparent,
+            rowColor: Colors.transparent,
+            cellTextStyle: TrinaGridStyleConfig.defaultDarkCellTextStyle,
+          )
+        : TrinaGridStyleConfig.dark();
+    final themeLight = widget.isTransparent
+        ? TrinaGridStyleConfig(
+            gridBackgroundColor: Colors.transparent,
+            rowColor: Colors.transparent,
+            cellTextStyle: TrinaGridStyleConfig.defaultLightCellTextStyle,
+          )
+        : TrinaGridStyleConfig();
+    final style = switch (brightness) {
+      Brightness.dark => themeDark,
+      Brightness.light => themeLight,
+    };
     return TrinaGrid(
-      configuration: TrinaGridConfiguration(
-        style: widget.isTransparent
-            ? TrinaGridStyleConfig(
-                gridBackgroundColor: Colors.transparent,
-                rowColor: Colors.transparent,
-              )
-            : const TrinaGridStyleConfig(),
-      ),
+      configuration: TrinaGridConfiguration(style: style),
       columns: columns,
       // initialize the table with empty rows, and then manage the rows entirely
       //  thru the StateManager API (i.e. _buildRows)

@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'app_state.dart';
+import 'state/app_state.dart';
 import 'home_page.dart';
+import 'state/theme_mode_state.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => AppState(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppState()),
+        ChangeNotifierProvider(create: (context) => ThemeModeState(context)),
+      ],
       child: const MyApp(),
     ),
   );
@@ -17,12 +21,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final modeState = context.watch<ThemeModeState>();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Trina Grid Demo',
+      themeMode: modeState.mode,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        brightness: Brightness.light,
+        primarySwatch: Colors.blue,
       ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        primarySwatch: Colors.indigo,
+      ),
+      title: 'Trina Grid Demo',
       home: const HomePage(),
     );
   }

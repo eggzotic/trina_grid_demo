@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'app_state.dart';
+import 'state/app_state.dart';
 import 'my_trina_table/my_trina_table.dart';
 import 'person_attributes.dart';
+import 'state/theme_mode_state.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,6 +17,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
+    final themeMode = context.watch<ThemeModeState>();
+    final icon = themeMode.icon;
     final grid = MyTrinaTable(
       isTransparent: true,
       sortAsc: true,
@@ -27,9 +30,15 @@ class _HomePageState extends State<HomePage> {
         message: "Nuke 'em!",
         child: Icon(Icons.close, color: Colors.red),
       ),
+      brightness: themeMode.brightness,
     );
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          tooltip: themeMode.description,
+          onPressed: () => themeMode.cycleMode(),
+          icon: Icon(icon),
+        ),
         title: Text("TrinaGrid Demo (${_appState.people.length})"),
         actions: [
           IconButton(
@@ -40,7 +49,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Container(color: Colors.grey,child: grid),
+      body: grid,
     );
   }
 }

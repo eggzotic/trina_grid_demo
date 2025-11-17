@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:random_name_generator/random_name_generator.dart';
-import 'date_ext.dart';
-import 'occupation.dart';
-import 'person.dart';
+import '../date_ext.dart';
+import '../occupation.dart';
+import '../person.dart';
 
 class AppState with ChangeNotifier {
   final _baseDate = DateTime(1920, 2, 12);
