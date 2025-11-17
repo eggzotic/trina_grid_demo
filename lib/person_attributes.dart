@@ -1,5 +1,5 @@
 import 'package:trina_grid/trina_grid.dart';
-import 'package:trina_grid_demo/my_trina_table/trina_heading_source.dart';
+import 'my_trina_table/trina_heading_source.dart';
 
 enum PersonAttributes implements TrinaHeadingSource {
   firstName(title: "First name"),

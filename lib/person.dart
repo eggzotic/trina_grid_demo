@@ -1,7 +1,7 @@
 import 'package:trina_grid/trina_grid.dart';
-import 'package:trina_grid_demo/date_ext.dart';
-import 'package:trina_grid_demo/occupation.dart';
-import 'package:trina_grid_demo/my_trina_table/trina_row_source.dart';
+import 'date_ext.dart';
+import 'occupation.dart';
+import 'my_trina_table/trina_row_source.dart';
 import 'package:uuid/uuid.dart';
 
 class Person implements TrinaRowSource {

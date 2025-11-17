@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:trina_grid_demo/app_state.dart';
-import 'package:trina_grid_demo/home_page.dart';
+import 'app_state.dart';
+import 'home_page.dart';
 
 void main() {
   runApp(

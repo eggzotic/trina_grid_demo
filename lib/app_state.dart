@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:random_name_generator/random_name_generator.dart';
-import 'package:trina_grid_demo/date_ext.dart';
-import 'package:trina_grid_demo/occupation.dart';
-import 'package:trina_grid_demo/person.dart';
+import 'date_ext.dart';
+import 'occupation.dart';
+import 'person.dart';
 
 class AppState with ChangeNotifier {
   final _baseDate = DateTime(1920, 2, 12);
@@ -22,7 +22,7 @@ class AppState with ChangeNotifier {
   void deletePerson(String uuid) {
     _people.removeWhere((person) {
       if (person.uuid == uuid) {
-        debugPrint("Deleting ${person.fullName}");
+        debugPrint("delete: ${person.fullName}");
         return true;
       }
       return false;
@@ -33,7 +33,7 @@ class AppState with ChangeNotifier {
   void addPerson() {
     final person = _generateNewPerson();
     _people.add(person);
-    debugPrint("AddPerson: ${person.fullName}");
+    debugPrint("add: ${person.fullName}");
     notifyListeners();
   }
 
