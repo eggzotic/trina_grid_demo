@@ -18,12 +18,15 @@ class _HomePageState extends State<HomePage> {
     debugPrint("HomePage build");
     final appState = context.watch<AppState>();
     final grid = MyTrinaTable(
-      sortAsc: true,
+      // sortAsc: true,
       sortColIndex: 1,
       headingsSource: PersonAttributes.values,
       rowsSource: appState.people,
       deleteRow: (id) => appState.deletePerson(id),
-      deleteIcon: Tooltip(message: "Nuke it!", child: Icon(Icons.close)),
+      deleteIcon: Tooltip(
+        message: "Nuke it!",
+        child: Icon(Icons.close, color: Colors.red),
+      ),
     );
     return Scaffold(
       appBar: AppBar(

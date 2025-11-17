@@ -8,8 +8,8 @@ import 'package:trina_grid_demo/my_trina_table/trina_row_source.dart';
 class MyTrinaTable extends StatefulWidget {
   const MyTrinaTable({
     super.key,
-    required this.sortAsc,
-    required this.sortColIndex,
+    this.sortAsc = true,
+    this.sortColIndex = 0,
     required this.headingsSource,
     required this.rowsSource,
     this.deleteRow,
