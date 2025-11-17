@@ -14,6 +14,7 @@ class MyTrinaTable extends StatefulWidget {
     required this.rowsSource,
     this.deleteRow,
     this.deleteIcon,
+    this.isTransparent = true,
   });
 
   /// Whether to initially sort Ascending
@@ -28,11 +29,17 @@ class MyTrinaTable extends StatefulWidget {
   /// A list of objects whose class the table-rows can be derived
   final List<TrinaRowSource> rowsSource;
 
-  /// An optional function which can perform the corresponding data-source-level delete of a row
+  /// An optional function which can perform the corresponding data-source-level
+  /// delete of a row
   final void Function(String id)? deleteRow;
 
-  /// Alternative icon to appear as the delete-row symbol - should be wrapped in Tooltip (if desired) as well
+  /// Alternative icon to appear as the delete-row symbol - should be wrapped in
+  /// Tooltip (if desired) as well
   final Widget? deleteIcon;
+
+  /// Whether to make the table transparent, and so allow the parent/wrapping
+  /// background be visible instead
+  final bool isTransparent;
 
   @override
   State<MyTrinaTable> createState() => _MyTrinaTableState();
@@ -104,6 +111,14 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
     }
     _buildRows();
     return TrinaGrid(
+      configuration: TrinaGridConfiguration(
+        style: widget.isTransparent
+            ? TrinaGridStyleConfig(
+                gridBackgroundColor: Colors.transparent,
+                rowColor: Colors.transparent,
+              )
+            : const TrinaGridStyleConfig(),
+      ),
       columns: columns,
       // initialize the table with empty rows, and then manage the rows entirely
       //  thru the StateManager API (i.e. _buildRows)

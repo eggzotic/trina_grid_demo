@@ -17,6 +17,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
     final grid = MyTrinaTable(
+      isTransparent: true,
       sortAsc: true,
       sortColIndex: 0,
       headingsSource: PersonAttributes.values,
@@ -39,7 +40,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: grid,
+      body: Container(color: Colors.grey,child: grid),
     );
   }
 }
