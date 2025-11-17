@@ -4,8 +4,9 @@ import 'occupation.dart';
 import 'my_trina_table/trina_row_source.dart';
 import 'package:uuid/uuid.dart';
 
+import 'person_attributes.dart';
+
 class Person implements TrinaRowSource {
-  // these field names must match *exactly* the corresponding enum cases (TableHeader)
   final String firstName;
   final String surname;
   final Occupation job;
@@ -32,12 +33,12 @@ class Person implements TrinaRowSource {
   @override
   Map<String, TrinaCell> tableRowFor() {
     return {
-      'firstName': TrinaCell(value: firstName),
-      'surname': TrinaCell(value: surname),
-      'job': TrinaCell(value: job.jobName),
-      'birthday': TrinaCell(value: birthday),
-      'age': TrinaCell(value: ageInYears),
-      'hasDog': TrinaCell(value: hasDog),
+      PersonAttributes.firstName.name: TrinaCell(value: firstName),
+      PersonAttributes.surname.name: TrinaCell(value: surname),
+      PersonAttributes.job.name: TrinaCell(value: job.jobName),
+      PersonAttributes.birthday.name: TrinaCell(value: birthday),
+      PersonAttributes.age.name: TrinaCell(value: ageInYears),
+      PersonAttributes.hasDog.name: TrinaCell(value: hasDog),
       'uuid': TrinaCell(value: uuid),
     };
   }
