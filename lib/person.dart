@@ -39,7 +39,6 @@ class Person implements TrinaRowSource {
       PersonAttributes.birthday.name: TrinaCell(value: birthday),
       PersonAttributes.age.name: TrinaCell(value: ageInYears),
       PersonAttributes.hasDog.name: TrinaCell(value: hasDog),
-      'uuid': TrinaCell(value: uuid),
     };
   }
 }
