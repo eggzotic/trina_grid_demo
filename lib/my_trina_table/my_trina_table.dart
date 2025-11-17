@@ -143,10 +143,6 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
       rows: [],
       onLoaded: (event) {
         _stateManager = event.stateManager;
-        // Auto-fit all cols initially
-        for (final col in columns) {
-          _stateManager!.autoFitColumn(context, col);
-        }
         // setup initial sorting
         _sortCol = columns[widget.sortColIndex + (_deleteAvailable ? 1 : 0)];
         widget.sortAsc
@@ -154,6 +150,10 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
             : _stateManager!.sortDescending(_sortCol);
         // initialise the rows
         _buildRows();
+        // Auto-fit all cols initially
+        for (final col in columns) {
+          _stateManager!.autoFitColumn(context, col);
+        }
       },
       onSorted: (event) {
         _sortCol = event.column;
