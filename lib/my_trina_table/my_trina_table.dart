@@ -16,6 +16,11 @@ class MyTrinaTable extends StatefulWidget {
     this.deleteIcon,
     this.isTransparent = true,
     this.brightness,
+    this.deleteTooltip,
+    this.deleteIconColor,
+    this.deleteUnless,
+    this.onSelectRow,
+    this.dateFormat,
   });
 
   /// Whether to initially sort Ascending
@@ -38,6 +43,12 @@ class MyTrinaTable extends StatefulWidget {
   /// Tooltip (if desired) as well
   final Widget? deleteIcon;
 
+  /// The message to indicate what action the delete button will take
+  final String? deleteTooltip;
+
+  /// The color for the delete-icon
+  final Color? deleteIconColor;
+
   /// Whether to make the table transparent, and so allow the parent/wrapping
   /// background be visible instead
   final bool isTransparent;
@@ -45,6 +56,15 @@ class MyTrinaTable extends StatefulWidget {
   /// The current/in-effect brightness (i.e. light/dark mode).
   /// Defaults to the platform brightness.
   final Brightness? brightness;
+
+  /// Whether to offer delete-functionality for a given item (e.g. decline to
+  /// offer sign-out of one's own session)
+  final bool Function(String id)? deleteUnless;
+
+  /// An optional call-back when a row is clicked on
+  final void Function(String id)? onSelectRow;
+
+  final String? dateFormat;
 
   @override
   State<MyTrinaTable> createState() => _MyTrinaTableState();
@@ -60,10 +80,12 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
     final state = _stateManager;
     if (state == null) return;
     final rowItems = widget.rowsSource;
+    final wasEmpty = state.rows.isEmpty;
     state
       ..removeAllRows(notify: false)
       ..appendRows(
         rowItems.map((item) {
+          final cannotDelete = widget.deleteUnless?.call(item.id) == true;
           return TrinaRow(
             key: ValueKey(item.id),
             cells: item.tableRowFor()
@@ -73,13 +95,17 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
                     'delete',
                     TrinaCell(
                       value: "",
-                      renderer: (rendererContext) => IconButton(
-                        tooltip: widget.deleteIcon != null ? "" : "Delete",
-                        onPressed: () {
-                          widget.deleteRow?.call(item.id);
-                        },
-                        icon: widget.deleteIcon ?? Icon(Icons.delete),
-                      ),
+                      renderer: (rendererContext) => cannotDelete
+                          ? SizedBox.fromSize(size: Size.zero)
+                          : IconButton(
+                              color: widget.deleteIconColor,
+                              tooltip:
+                                  "${widget.deleteTooltip ?? "Delete"} ${item.id}",
+                              onPressed: () {
+                                widget.deleteRow?.call(item.id);
+                              },
+                              icon: widget.deleteIcon ?? Icon(Icons.delete),
+                            ),
                     ),
                   ),
               ]),
@@ -95,12 +121,19 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
         "Sort column (${_sortCol.field}) has no asc/desc set, skipping sort",
       );
     }
+    if (wasEmpty) _autofit(state.columns);
+  }
+
+  void _autofit(List<TrinaColumn> columns) {
+    for (final col in columns) {
+      _stateManager!.autoFitColumn(context, col);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final columns = widget.headingsSource
-        .map((heading) => heading.columnFor())
+        .map((heading) => heading.columnFor(dateFormat: widget.dateFormat))
         .toList();
     if (_deleteAvailable) {
       columns.insert(
@@ -136,7 +169,10 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
       Brightness.light => themeLight,
     };
     return TrinaGrid(
-      configuration: TrinaGridConfiguration(style: style),
+      configuration: TrinaGridConfiguration(
+        style: style,
+        selectingMode: TrinaGridSelectingMode.row,
+      ),
       columns: columns,
       // initialize the table with empty rows, and then manage the rows entirely
       //  thru the StateManager API (i.e. _buildRows)
@@ -150,13 +186,17 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
             : _stateManager!.sortDescending(_sortCol);
         // initialise the rows
         _buildRows();
-        // Auto-fit all cols initially
-        for (final col in columns) {
-          _stateManager!.autoFitColumn(context, col);
-        }
       },
       onSorted: (event) {
         _sortCol = event.column;
+      },
+      onSelected: (event) {
+        try {
+          final itemId = (event.row?.key as ValueKey).value as String;
+          widget.onSelectRow?.call(itemId);
+        } catch (e) {
+          debugPrint("onSelected row ${event.rowIdx}");
+        }
       },
     );
   }

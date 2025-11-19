@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'state/app_state.dart';
 import 'home_page.dart';
 import 'state/theme_mode_state.dart';
 
-void main() {
+void main() async{
+  // necessary before any multi-language/date-formatting etc can safely be done
+  await initializeDateFormatting();
   runApp(
     MultiProvider(
       providers: [

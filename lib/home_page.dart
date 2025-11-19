@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'state/app_state.dart';
 import 'my_trina_table/my_trina_table.dart';
@@ -19,7 +20,12 @@ class _HomePageState extends State<HomePage> {
     final appState = context.watch<AppState>();
     final themeMode = context.watch<ThemeModeState>();
     final icon = themeMode.icon;
+    final dateFormat = DateFormat(
+      DateFormat.YEAR_NUM_MONTH_DAY,
+      "es",
+    ).add_Hm().pattern;
     final grid = MyTrinaTable(
+      dateFormat: dateFormat,
       isTransparent: true,
       sortAsc: true,
       sortColIndex: 0,

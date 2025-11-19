@@ -14,14 +14,21 @@ enum PersonAttributes implements TrinaHeadingSource {
   const PersonAttributes({required this.title});
 
   @override
-  TrinaColumn columnFor() {
-    return TrinaColumn(title: title, field: name, type: type, readOnly: true);
+  TrinaColumn columnFor({String? dateFormat}) {
+    return TrinaColumn(
+      title: title,
+      field: name,
+      type: _type(dateFormat: dateFormat),
+      readOnly: true,
+    );
   }
 
-  TrinaColumnType get type => switch (this) {
+  TrinaColumnType _type({String? dateFormat}) => switch (this) {
     firstName || surname || job => TrinaColumnType.text(),
     age => TrinaColumnType.number(),
-    birthday => TrinaColumnType.date(),
+    birthday => TrinaColumnType.dateTime(
+      format: dateFormat ?? 'yyyy-MM-dd HH:mm',
+    ),
     hasDog => TrinaColumnType.boolean(),
   };
 }
