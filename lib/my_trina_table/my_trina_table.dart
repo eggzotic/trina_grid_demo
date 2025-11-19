@@ -21,6 +21,10 @@ class MyTrinaTable extends StatefulWidget {
     this.deleteUnless,
     this.onSelectRow,
     this.dateFormat,
+    this.maxRowsPerPage,
+    this.cornerRadius = 0,
+    this.showRowBorders = false,
+    this.showColumnBorders = false,
   });
 
   /// Whether to initially sort Ascending
@@ -65,6 +69,19 @@ class MyTrinaTable extends StatefulWidget {
   final void Function(String id)? onSelectRow;
 
   final String? dateFormat;
+
+  /// Pagination will be used if this is non-null
+  final int? maxRowsPerPage;
+
+  /// Use this in case of wrapping the table, in e.g. a Card widget, which might
+  /// have rounded corners
+  final double cornerRadius;
+
+  /// Whether to show the horizontal borders between rows
+  final bool showRowBorders;
+
+  /// Whether to show the vertical borders between columns
+  final bool showColumnBorders;
 
   @override
   State<MyTrinaTable> createState() => _MyTrinaTableState();
@@ -130,6 +147,8 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
     }
   }
 
+  bool get _usePagination => widget.maxRowsPerPage != null;
+
   @override
   Widget build(BuildContext context) {
     final columns = widget.headingsSource
@@ -150,24 +169,53 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
     _buildRows();
     final brightness =
         widget.brightness ?? MediaQuery.platformBrightnessOf(context);
-    final themeDark = widget.isTransparent
-        ? TrinaGridStyleConfig.dark(
-            gridBackgroundColor: Colors.transparent,
-            rowColor: Colors.transparent,
-            cellTextStyle: TrinaGridStyleConfig.defaultDarkCellTextStyle,
-          )
-        : TrinaGridStyleConfig.dark();
-    final themeLight = widget.isTransparent
-        ? TrinaGridStyleConfig(
-            gridBackgroundColor: Colors.transparent,
-            rowColor: Colors.transparent,
-            cellTextStyle: TrinaGridStyleConfig.defaultLightCellTextStyle,
-          )
-        : TrinaGridStyleConfig();
+
+    final themeDark = TrinaGridStyleConfig.dark(
+      gridBorderRadius: BorderRadius.circular(widget.cornerRadius),
+      gridBackgroundColor: widget.isTransparent
+          ? Colors.transparent
+          : const Color(0xFF111111),
+      rowColor: widget.isTransparent
+          ? Colors.transparent
+          : const Color(0xFF111111),
+
+      // The overall around-the-outside table-border
+      // gridBorderColor: Colors.transparent,
+      // gridBorderWidth: 0,
+
+      // The Cell border
+      // borderColor: Colors.transparent,
+
+      // enableColumnBorderVertical: true,
+      // enableColumnBorderHorizontal: false,
+      enableCellBorderVertical: widget.showColumnBorders,
+      enableCellBorderHorizontal: widget.showRowBorders,
+    );
+    final themeLight = TrinaGridStyleConfig(
+      gridBorderRadius: BorderRadius.circular(widget.cornerRadius),
+      gridBackgroundColor: widget.isTransparent
+          ? Colors.transparent
+          : Colors.white,
+      rowColor: widget.isTransparent ? Colors.transparent : Colors.white,
+
+      // The overall around-the-outside table-border
+      // gridBorderColor: Colors.transparent,
+      // gridBorderWidth: 0,
+
+      // The Cell border
+      // borderColor: Colors.transparent,
+
+      // enableColumnBorderVertical: true,
+      // enableColumnBorderHorizontal: false,
+      enableCellBorderVertical: widget.showColumnBorders,
+      enableCellBorderHorizontal: widget.showRowBorders,
+    );
+
     final style = switch (brightness) {
       Brightness.dark => themeDark,
       Brightness.light => themeLight,
     };
+
     return TrinaGrid(
       configuration: TrinaGridConfiguration(
         style: style,
@@ -184,6 +232,9 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
         widget.sortAsc
             ? _stateManager!.sortAscending(_sortCol)
             : _stateManager!.sortDescending(_sortCol);
+        if (_usePagination) {
+          _stateManager!.setPageSize(widget.maxRowsPerPage!);
+        }
         // initialise the rows
         _buildRows();
       },
@@ -198,6 +249,11 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
           debugPrint("onSelected row ${event.rowIdx}");
         }
       },
+      createFooter: _usePagination
+          ? (stateManager) {
+              return TrinaPagination(stateManager, pageSizeToMove: 1);
+            }
+          : null,
     );
   }
 }

@@ -5,7 +5,7 @@ import 'state/app_state.dart';
 import 'home_page.dart';
 import 'state/theme_mode_state.dart';
 
-void main() async{
+void main() async {
   // necessary before any multi-language/date-formatting etc can safely be done
   await initializeDateFormatting();
   runApp(

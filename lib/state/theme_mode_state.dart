@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ThemeModeState with ChangeNotifier {
+  final cornerRadius = 15.0;
+
   final BuildContext context;
   ThemeModeState(this.context);
   ThemeMode get mode => _themeMode;

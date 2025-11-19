@@ -26,7 +26,6 @@ class _HomePageState extends State<HomePage> {
     ).add_Hm().pattern;
     final grid = MyTrinaTable(
       dateFormat: dateFormat,
-      isTransparent: true,
       sortAsc: true,
       sortColIndex: 0,
       headingsSource: PersonAttributes.values,
@@ -37,6 +36,7 @@ class _HomePageState extends State<HomePage> {
         child: Icon(Icons.close, color: Colors.red),
       ),
       brightness: themeMode.brightness,
+      cornerRadius: themeMode.cornerRadius,
     );
     return Scaffold(
       appBar: AppBar(
@@ -48,9 +48,8 @@ class _HomePageState extends State<HomePage> {
         title: Text("TrinaGrid Demo (${_appState.people.length})"),
         actions: [
           IconButton(
-            onPressed: () {
-              appState.addPerson();
-            },
+            tooltip: "Add person",
+            onPressed: () => appState.addPerson(),
             icon: Icon(Icons.add),
           ),
         ],
