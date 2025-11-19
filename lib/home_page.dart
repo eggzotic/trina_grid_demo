@@ -22,7 +22,7 @@ class _HomePageState extends State<HomePage> {
     final icon = themeMode.icon;
     final dateFormat = DateFormat(
       DateFormat.YEAR_NUM_MONTH_DAY,
-      "es",
+      "en_GB",
     ).add_Hm().pattern;
     final grid = MyTrinaTable(
       dateFormat: dateFormat,

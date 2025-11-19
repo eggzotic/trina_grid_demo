@@ -19,9 +19,9 @@ class AppState with ChangeNotifier {
 
   final _people = <Person>[];
   List<Person> get people => [..._people];
-  void deletePerson(String uuid) {
+  void deletePerson(String id) {
     _people.removeWhere((person) {
-      if (person.uuid == uuid) {
+      if (person.id == id) {
         debugPrint("delete: ${person.fullName}");
         return true;
       }

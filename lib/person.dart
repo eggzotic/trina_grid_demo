@@ -1,12 +1,12 @@
 import 'package:trina_grid/trina_grid.dart';
 import 'date_ext.dart';
 import 'occupation.dart';
-import 'my_trina_table/trina_row_source.dart';
+import 'my_trina_table/row_source.dart';
 import 'package:uuid/uuid.dart';
 
 import 'person_attributes.dart';
 
-class Person implements TrinaRowSource {
+class Person implements RowSource {
   final String firstName;
   final String surname;
   final Occupation job;
