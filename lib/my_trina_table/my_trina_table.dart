@@ -261,7 +261,9 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
       },
       onSelected: (event) {
         try {
-          final itemId = (event.row?.key as ValueKey).value as String;
+          final itemId = (event.row?.key as ValueKey<String>).value
+              .split("_")
+              .first;
           widget.onSelectRow?.call(itemId);
         } catch (e) {
           debugPrint("onSelected row ${event.rowIdx}");
