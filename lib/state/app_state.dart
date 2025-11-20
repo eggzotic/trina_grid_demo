@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:random_name_generator/random_name_generator.dart';
 import '../date_ext.dart';
-import '../occupation.dart';
-import '../person.dart';
+import '../model/occupation.dart';
+import '../model/person.dart';
 
 class AppState with ChangeNotifier {
   final _baseDate = DateTime(1920, 2, 12);
@@ -21,7 +21,7 @@ class AppState with ChangeNotifier {
   List<Person> get people => [..._people];
   void deletePerson(String id) {
     _people.removeWhere((person) {
-      if (person.id == id) {
+      if (person.uuid == id) {
         debugPrint("delete: ${person.fullName}");
         return true;
       }
@@ -68,7 +68,7 @@ class AppState with ChangeNotifier {
       } else {
         debugPrint("Purging excess people...");
         while (_people.length > 10) {
-          deletePerson(_people.last.id);
+          deletePerson(_people.last.uuid);
         }
       }
     });

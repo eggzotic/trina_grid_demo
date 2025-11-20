@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:trina_grid/trina_grid.dart';
 import 'heading_source.dart';
@@ -94,79 +93,60 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
 
   bool get _deleteAvailable => widget.deleteRow != null;
 
-  final _previousRows = <RowSource>[];
-
   void _buildRows() {
     final state = _stateManager;
     if (state == null) return;
     final rowItems = widget.rowsSource;
     final wasEmpty = state.rows.isEmpty;
 
-    // final rowIds = widget.rowsSource.map((rs) => rs.id);
-    // final rowsToDelete = state.rows.where((row) => row.)
+    final allNewRowKeys = rowItems.map((row) => row.rowKey).toSet();
 
-    final previousRowIds = _previousRows.map((pr) => pr.id).toList();
-    final allRowIds = widget.rowsSource.map((rs) => rs.id);
-    previousRowIds.removeWhere((prId) => !allRowIds.contains(prId));
-    final newRowIds = widget.rowsSource.where((rs) => !previousRowIds.contains(rs.id));
+    final oldRowKeys = state.refRows
+        .map((row) => (row.key as ValueKey<String>).value)
+        .toSet();
 
-    // remove rows no longer present
-    _previousRows.removeWhere(
-      (pr) => widget.rowsSource.map((rs) => rs.id).contains(pr.id),
+    final onlyNewRows = rowItems
+        .where((row) => !oldRowKeys.contains(row.rowKey))
+        .toSet();
+
+    // Remove rows no longer present, or which have been modified, from the state
+    state.refRows.removeWhere(
+      (row) => !allNewRowKeys.contains((row.key as ValueKey<String>).value),
     );
 
-    // update those rows whose data has changed
-    final replaceRowIds = <String>{};
-    for (final pr in _previousRows) {
-      final newRow = widget.rowsSource.firstWhereOrNull((rs) => rs.id == pr.id);
-      if (newRow == null) {
-        debugPrint("Row not found for id ${pr.id}");
-        continue;
-      }
-      if (pr != newRow) {
-        debugPrint("Updating row with id ${pr.id}");
-        replaceRowIds.add(pr.id);
-      }
-    }
-    for (final rowId in replaceRowIds) {
-      _previousRows.removeWhere((pr) => pr.id == rowId);
-      _previousRows.add(widget.rowsSource.firstWhere((rs) => rs.id == rowId));
-    }
-
-    // add new rows
-    _previousRows.addAll(widget.rowsSource.)
-
-    state
-      ..removeAllRows(notify: false)
-      ..appendRows(
-        rowItems.map((item) {
-          final cannotDelete = widget.deleteUnless?.call(item.id) == true;
-          return TrinaRow(
-            key: ValueKey(item.id),
-            cells: item.tableRowFor()
-              ..addEntries([
-                if (_deleteAvailable)
-                  MapEntry(
-                    'delete',
-                    TrinaCell(
-                      value: "",
-                      renderer: (rendererContext) => cannotDelete
-                          ? SizedBox.fromSize(size: Size.zero)
-                          : IconButton(
-                              color: widget.deleteIconColor,
-                              tooltip:
-                                  "${widget.deleteTooltip ?? "Delete"} ${item.id}",
-                              onPressed: () {
-                                widget.deleteRow?.call(item.id);
-                              },
-                              icon: widget.deleteIcon ?? Icon(Icons.delete),
-                            ),
-                    ),
-                  ),
-              ]),
-          );
-        }).toList(),
+    // compose the content of the new/replaced rows only
+    final newRowContent = onlyNewRows.map((item) {
+      final cannotDelete = widget.deleteUnless?.call(item.id) == true;
+      return TrinaRow(
+        key: ValueKey(item.rowKey),
+        cells: item.tableRowFor()
+          ..addEntries([
+            if (_deleteAvailable)
+              MapEntry(
+                'delete',
+                TrinaCell(
+                  value: "",
+                  renderer: (rendererContext) => cannotDelete
+                      ? SizedBox.fromSize(size: Size.zero)
+                      : IconButton(
+                          color: widget.deleteIconColor,
+                          tooltip:
+                              "${widget.deleteTooltip ?? "Delete"} ${item.id}",
+                          onPressed: () {
+                            widget.deleteRow?.call(item.id);
+                          },
+                          icon: widget.deleteIcon ?? Icon(Icons.delete),
+                        ),
+                ),
+              ),
+          ]),
       );
+    });
+
+    // add the new rows to the state
+    state.refRows.addAll(newRowContent);
+
+    // apply the current sorting
     if (_sortCol.sort.isAscending) {
       state.sortAscending(_sortCol);
     } else if (_sortCol.sort.isDescending) {

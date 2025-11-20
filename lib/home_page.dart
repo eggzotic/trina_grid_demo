@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'model/person_row_content.dart';
 import 'state/app_state.dart';
 import 'my_trina_table/my_trina_table.dart';
-import 'person_attributes.dart';
+import 'model/person_attributes.dart';
 import 'state/theme_mode_state.dart';
 
 class HomePage extends StatefulWidget {
@@ -29,7 +30,9 @@ class _HomePageState extends State<HomePage> {
       sortAsc: true,
       sortColIndex: 0,
       headingsSource: PersonAttributes.values,
-      rowsSource: appState.people,
+      rowsSource: appState.people
+          .map((person) => PersonRowContent(person: person))
+          .toList(),
       deleteRow: (id) => appState.deletePerson(id),
       deleteIcon: Tooltip(
         message: "Nuke 'em!",
