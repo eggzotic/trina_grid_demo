@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:trina_grid/trina_grid.dart';
 import 'heading_source.dart';
@@ -93,11 +94,48 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
 
   bool get _deleteAvailable => widget.deleteRow != null;
 
+  final _previousRows = <RowSource>[];
+
   void _buildRows() {
     final state = _stateManager;
     if (state == null) return;
     final rowItems = widget.rowsSource;
     final wasEmpty = state.rows.isEmpty;
+
+    // final rowIds = widget.rowsSource.map((rs) => rs.id);
+    // final rowsToDelete = state.rows.where((row) => row.)
+
+    final previousRowIds = _previousRows.map((pr) => pr.id).toList();
+    final allRowIds = widget.rowsSource.map((rs) => rs.id);
+    previousRowIds.removeWhere((prId) => !allRowIds.contains(prId));
+    final newRowIds = widget.rowsSource.where((rs) => !previousRowIds.contains(rs.id));
+
+    // remove rows no longer present
+    _previousRows.removeWhere(
+      (pr) => widget.rowsSource.map((rs) => rs.id).contains(pr.id),
+    );
+
+    // update those rows whose data has changed
+    final replaceRowIds = <String>{};
+    for (final pr in _previousRows) {
+      final newRow = widget.rowsSource.firstWhereOrNull((rs) => rs.id == pr.id);
+      if (newRow == null) {
+        debugPrint("Row not found for id ${pr.id}");
+        continue;
+      }
+      if (pr != newRow) {
+        debugPrint("Updating row with id ${pr.id}");
+        replaceRowIds.add(pr.id);
+      }
+    }
+    for (final rowId in replaceRowIds) {
+      _previousRows.removeWhere((pr) => pr.id == rowId);
+      _previousRows.add(widget.rowsSource.firstWhere((rs) => rs.id == rowId));
+    }
+
+    // add new rows
+    _previousRows.addAll(widget.rowsSource.)
+
     state
       ..removeAllRows(notify: false)
       ..appendRows(

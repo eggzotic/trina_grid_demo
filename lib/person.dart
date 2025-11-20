@@ -41,4 +41,25 @@ class Person implements RowSource {
       PersonAttributes.hasDog.name: TrinaCell(value: hasDog),
     };
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Person &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          firstName == other.firstName &&
+          surname == other.surname &&
+          job == other.job &&
+          birthday == other.birthday &&
+          hasDog == other.hasDog;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      firstName.hashCode ^
+      surname.hashCode ^
+      job.hashCode ^
+      birthday.hashCode ^
+      hasDog.hashCode;
 }
