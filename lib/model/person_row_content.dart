@@ -3,7 +3,8 @@ import '../my_trina_table/row_source.dart';
 import 'person.dart';
 import 'person_attributes.dart';
 
-/// This class serves as a view-model - providing the
+/// This class serves as a view-model - providing the required interface for use
+///  with MyTrinaTable
 class PersonRowContent with RowSource {
   final Person person;
   PersonRowContent({required this.person})
