@@ -98,37 +98,55 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
     if (state == null) return;
     final rowItems = widget.rowsSource;
     final wasEmpty = state.rows.isEmpty;
-    state
-      ..removeAllRows(notify: false)
-      ..appendRows(
-        rowItems.map((item) {
-          final cannotDelete = widget.deleteUnless?.call(item.id) == true;
-          return TrinaRow(
-            key: ValueKey(item.id),
-            cells: item.tableRowFor()
-              ..addEntries([
-                if (_deleteAvailable)
-                  MapEntry(
-                    'delete',
-                    TrinaCell(
-                      value: "",
-                      renderer: (rendererContext) => cannotDelete
-                          ? SizedBox.fromSize(size: Size.zero)
-                          : IconButton(
-                              color: widget.deleteIconColor,
-                              tooltip:
-                                  "${widget.deleteTooltip ?? "Delete"} ${item.id}",
-                              onPressed: () {
-                                widget.deleteRow?.call(item.id);
-                              },
-                              icon: widget.deleteIcon ?? Icon(Icons.delete),
-                            ),
-                    ),
-                  ),
-              ]),
-          );
-        }).toList(),
+
+    final allNewRowKeys = rowItems.map((row) => row.rowKey).toSet();
+
+    final oldRowKeys = state.refRows
+        .map((row) => (row.key as ValueKey<String>).value)
+        .toSet();
+
+    final onlyNewRows = rowItems
+        .where((row) => !oldRowKeys.contains(row.rowKey))
+        .toSet();
+
+    // Remove rows no longer present, or which have been modified, from the state
+    state.refRows.removeWhere(
+      (row) => !allNewRowKeys.contains((row.key as ValueKey<String>).value),
+    );
+
+    // compose the content of the new/replaced rows only
+    final newRowContent = onlyNewRows.map((item) {
+      final cannotDelete = widget.deleteUnless?.call(item.id) == true;
+      return TrinaRow(
+        key: ValueKey(item.rowKey),
+        cells: item.tableRowFor()
+          ..addEntries([
+            if (_deleteAvailable)
+              MapEntry(
+                'delete',
+                TrinaCell(
+                  value: "",
+                  renderer: (rendererContext) => cannotDelete
+                      ? SizedBox.fromSize(size: Size.zero)
+                      : IconButton(
+                          color: widget.deleteIconColor,
+                          tooltip:
+                              "${widget.deleteTooltip ?? "Delete"} ${item.id}",
+                          onPressed: () {
+                            widget.deleteRow?.call(item.id);
+                          },
+                          icon: widget.deleteIcon ?? Icon(Icons.delete),
+                        ),
+                ),
+              ),
+          ]),
       );
+    });
+
+    // add the new rows to the state
+    state.refRows.addAll(newRowContent);
+
+    // apply the current sorting
     if (_sortCol.sort.isAscending) {
       state.sortAscending(_sortCol);
     } else if (_sortCol.sort.isDescending) {
