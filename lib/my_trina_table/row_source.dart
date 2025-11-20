@@ -12,13 +12,5 @@ abstract mixin class RowSource {
   /// determine/guarantee equality of 2 different instances
   int get rowHash;
 
-  bool isEquivalentTo(Object other) {
-    return identical(this, other) ||
-        runtimeType == other.runtimeType &&
-            other is RowSource &&
-            id == other.id &&
-            rowHash == other.rowHash;
-  }
-
   String get rowKey => "${id}_$rowHash";
 }
