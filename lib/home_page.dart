@@ -40,6 +40,15 @@ class _HomePageState extends State<HomePage> {
       ),
       brightness: themeMode.brightness,
       cornerRadius: themeMode.cornerRadius,
+      onSelectRow: (id) {
+        final personList = appState.people.where((person) => person.uuid == id);
+        final person = (personList.isEmpty)
+            ? "No-one"
+            : personList.first.fullName;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("$person says hi!")));
+      },
     );
     return Scaffold(
       appBar: AppBar(

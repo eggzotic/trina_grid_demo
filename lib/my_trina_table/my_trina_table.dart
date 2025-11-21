@@ -141,10 +141,10 @@ class _MyTrinaTableState extends State<MyTrinaTable> {
               ),
           ]),
       );
-    });
+    }).toList();
 
     // add the new rows to the state
-    state.refRows.addAll(newRowContent);
+    state.appendRows(newRowContent);
 
     // apply the current sorting
     if (_sortCol.sort.isAscending) {
